@@ -1,3 +1,5 @@
+import { set } from '@ember/object';
+
 class CellState {
   constructor() {
     this.isOpened = false;
@@ -8,14 +10,14 @@ class CellState {
     if (this.isFlagged) {
       throw new Error("The cell cannot be opened because it is already been flagged");
     }
-    this.isOpened = true;
+    set(this, 'isOpened', true);
   }
 
   makeFlagged() {
     if (this.isOpened) {
       throw new Error("The cell cannot be flagged because it is already opened");
     }
-    this.isFlagged = true;
+    set(this, 'isFlagged', true);
   }
 }
 
