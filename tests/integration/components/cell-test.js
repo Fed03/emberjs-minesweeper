@@ -4,6 +4,8 @@ import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { CellState } from 'minesweeper/models/cell-state';
 import sinon from 'sinon';
+import { run } from '@ember/runloop';
+
 
 const componentSelector = "[data-test-cell-component]";
 
@@ -140,5 +142,65 @@ module('Integration | Component | cell', function (hooks) {
 
     assert.dom(componentSelector).doesNotHaveClass("board-cell-closed");
     assert.dom(componentSelector).hasClass("board-cell-opened");
+  });
+
+  test('given a closed cell, when right clicked, then it should makeFlagged', async function (assert) {
+    const state = new CellState()
+    const openCell = sinon.spy(state, 'openCell');
+    const makeFlagged = sinon.spy(state, 'makeFlagged');
+
+    this.set("state", state);
+    this.set("externalAction", sinon.fake());
+
+    await render(hbs`{{board-cell cellState=state onOpenCell=(action externalAction)}}`);
+
+    const rightButton = 2;
+    await click(componentSelector, { button: rightButton });
+
+    assert.ok(makeFlagged.calledOnce)
+    assert.ok(openCell.notCalled)
+  });
+
+  test('given an open cell, when right clicked, then it should do not call makeFlagged', async function (assert) {
+    const state = new CellState()
+    state.openCell();
+    const makeFlagged = sinon.spy(state, 'makeFlagged');
+
+    this.set("state", state);
+    this.set("externalAction", sinon.fake());
+
+    await render(hbs`{{board-cell cellState=state onOpenCell=(action externalAction)}}`);
+
+    const rightButton = 2;
+    await click(componentSelector, { button: rightButton });
+
+    assert.ok(makeFlagged.notCalled)
+  });
+
+  test('given a flagged cell, when clicked, then it should do not call openCell', async function (assert) {
+    const state = new CellState()
+    state.makeFlagged();
+    const openCell = sinon.spy(state, 'openCell');
+
+    this.set("state", state);
+    this.set("externalAction", sinon.fake());
+
+    await render(hbs`{{board-cell cellState=state onOpenCell=(action externalAction)}}`);
+
+    await click(componentSelector);
+
+    assert.ok(openCell.notCalled)
+  });
+
+  test('given a flagged cell, then it should show an icon', async function (assert) {
+    const state = new CellState();
+
+    this.set("state", state);
+    await render(hbs`{{board-cell cellState=state}}`);
+
+    assert.dom(`${componentSelector} [data-test-flag-icon]`).doesNotExist();
+
+    run(() => state.makeFlagged());
+    assert.dom(`${componentSelector} [data-test-flag-icon]`).exists();
   });
 });
