@@ -1,0 +1,8 @@
+{{#if isOpened}}
+  {{#if shouldShowNeighboringMines}}
+    <span data-test-neighboring-mines>{{neighboringMines}}</span>
+  {{/if}}
+  {{#if hasMine}}
+    {{fa-icon "bomb" data-test-mine-icon}}
+  {{/if}}
+{{/if}}
