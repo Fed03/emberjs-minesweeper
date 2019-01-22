@@ -3,7 +3,7 @@ import { mandatoryParam } from '../utils/mandatory-param';
 
 class Cell {
   constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), neighboringMines = mandatoryParam()) {
-    this.position = { x, y };
+    this.position = [x, y];
     this.hasMine = hasMine;
     this.neighboringMines = neighboringMines;
 
@@ -23,6 +23,11 @@ class Cell {
       throw new Error("The cell cannot be flagged because it is already opened");
     }
     set(this, 'isFlagged', true);
+  }
+
+  isInPosition(x, y) {
+    const [cellX, cellY] = this.position
+    return cellX === x && cellY === y;
   }
 }
 

@@ -1,5 +1,6 @@
-import { module, skip, test } from 'qunit';
+import { module, test } from 'qunit';
 import { boardFactory } from '../../factories';
+import isEqual from "lodash.isequal";
 
 module('Unit | Model | Board', function () {
   test('Given a board, when setting the number of flagged cells, it should do that', function (assert) {
@@ -42,16 +43,59 @@ module('Unit | Model | Board', function () {
     assert.throws(act);
   });
 
-  skip('Given a 3x3 board, it can return the neighboring cells of the center one', function (assert) {
+  test('Given a 3x3 board, it can return the neighboring cells of the center one', function (assert) {
     const rows = 3, columns = 3;
-    const bState = boardFactory(rows, columns);
-    let results = bState.getNeighborCellsOf({ x: 2, y: 2 });
+    const board = boardFactory(rows, columns);
+
+    const expectedPositions = [
+      [0, 0], [0, 1], [0, 2],
+      [1, 0], [1, 2],
+      [2, 0], [2, 1], [2, 2]
+    ];
+
+    let results = [...board.getNeighborCellsOf([1, 1])];
 
     assert.equal(results.length, 8);
-    [...Array(rows).keys()].forEach(x => {
-      [...Array(columns).keys()].forEach(y => {
-        assert.ok(results.find(cell => cell.isInPosition(x, y)));
-      });
-    });
+
+    results.forEach(cell => {
+      assert.ok(expectedPositions.some(pos => isEqual(pos, cell.position)));
+    })
+  });
+
+  test('Given a 3x3 board, it can return the neighboring cells of a corner one', function (assert) {
+    const rows = 3, columns = 3;
+    const board = boardFactory(rows, columns);
+
+    const expectedPositions = [
+      [0, 1],
+      [1, 1], [1, 2]
+    ];
+
+    let results = [...board.getNeighborCellsOf([0, 2])];
+
+    assert.equal(results.length, 3);
+
+    results.forEach(cell => {
+      assert.ok(expectedPositions.some(pos => isEqual(pos, cell.position)));
+    })
+  });
+
+  test('Given a 3x3 board, it can return the neighboring cells of a border one', function (assert) {
+    const rows = 3, columns = 3;
+    const board = boardFactory(rows, columns);
+
+    const expectedPositions = [
+      [0, 0], [0, 1],
+      [1, 1],
+      [2, 0], [2, 1]
+    ];
+
+    let results = [...board.getNeighborCellsOf([1, 0])];
+
+    assert.equal(results.length, 5);
+
+    results.forEach(cell => {
+      assert.ok(expectedPositions.some(pos => isEqual(pos, cell.position)));
+    })
   });
 })
