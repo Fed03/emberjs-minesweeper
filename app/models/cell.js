@@ -1,7 +1,12 @@
 import { set } from '@ember/object';
+import { mandatoryParam } from '../utils/mandatory-param';
 
-class CellState {
-  constructor() {
+class Cell {
+  constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), neighboringMines = mandatoryParam()) {
+    this.position = { x, y };
+    this.hasMine = hasMine;
+    this.neighboringMines = neighboringMines;
+
     this.isOpened = false;
     this.isFlagged = false;
   }
@@ -21,4 +26,4 @@ class CellState {
   }
 }
 
-export { CellState };
+export { Cell };
