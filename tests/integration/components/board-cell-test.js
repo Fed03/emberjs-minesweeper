@@ -114,6 +114,19 @@ module('Integration | Component | board-cell', function (hooks) {
     assert.ok(externalAction.calledOnce);
   });
 
+  test('given a closed cell, when firing the open action, the it should pass the model as its argument', async function (assert) {
+    const model = cellFactory();
+    this.set("cell", model);
+
+    const externalAction = sinon.spy();
+    this.set("externalAction", externalAction);
+    await render(hbs`{{board-cell model=cell onOpenCell=(action externalAction)}}`);
+
+    await click(componentSelector);
+
+    assert.ok(externalAction.calledWithExactly(model));
+  });
+
   test('given an already open cell, when clicked, then it should not fire an action', async function (assert) {
     const state = cellFactory();
     state.openCell();
