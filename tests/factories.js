@@ -21,7 +21,31 @@ function cellsListFactory(rows, columns) {
     }
   }
 
+  assignNeighborhoodToEveryCell(cells, rows, columns);
+
   return cells;
 }
 
-export { boardFactory, cellFactory };
+function assignNeighborhoodToEveryCell(cells, rows, columns) {
+  cells.forEach(cell => {
+    cell.setNeighboringCells([...getNeighborCellsOf(cell.position, cells, rows, columns)])
+  });
+}
+
+function* getNeighborCellsOf([x, y], cellList, rows, cols) {
+  for (const cellX of range(..._neighborhoodBounds(x, rows))) {
+    for (const cellY of range(..._neighborhoodBounds(y, cols))) {
+      let cell = cellList.find(cell => cell.isInPosition(cellX, cellY));
+      if (!cell.isInPosition(x, y)) {
+        yield cell;
+      }
+    }
+  }
+}
+
+function _neighborhoodBounds(coord, maxBound) {
+  return [Math.max(0, coord - 1), Math.min(maxBound - 1, coord + 1) + 1];
+}
+
+
+export { boardFactory, cellFactory, cellsListFactory };
