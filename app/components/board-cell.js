@@ -30,6 +30,6 @@ export default Component.extend({
   },
 
   handleRightClick() {
-    this.model.makeFlagged();
+    this.onFlagCell(this.model);
   }
 });

@@ -5,6 +5,9 @@ export default Component.extend({
   actions: {
     openedCell(clickedCell) {
       this._openCell(clickedCell);
+    },
+    flaggedCell(cell) {
+      cell.makeFlagged();
     }
   },
 

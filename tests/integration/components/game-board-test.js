@@ -22,6 +22,16 @@ module('Integration | Component | game-board', function (hooks) {
     assert.dom(`${componentSelector} [data-test-cell]`).exists({ count: 9 });
   });
 
+  test('given a board, when right clicking on a close cell, it should be flagged', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    this.set("board", boardFactory(3, 3, 0, cells));
+    await render(hbs`{{game-board model=board}}`);
+
+    await click('[data-test-cell="2,2"]', { button: 2 });
+
+    assert.ok(getCell(cells, 2, 2).isFlagged);
+  });
+
   /*
         0   1   2
       +---+---+---+

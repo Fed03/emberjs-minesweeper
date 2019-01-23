@@ -1,6 +1,8 @@
 import { set } from '@ember/object';
 import { mandatoryParam } from '../utils/mandatory-param';
 
+
+//TODO: unflag
 class Cell {
   constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), neighboringCells = []) {
     this.position = [x, y];

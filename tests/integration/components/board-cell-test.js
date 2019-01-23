@@ -135,52 +135,73 @@ module('Integration | Component | board-cell', function (hooks) {
     assert.dom(componentSelector).hasClass("board-cell-opened");
   });
 
-  test('given a closed cell, when right clicked, then it should makeFlagged', async function (assert) {
-    const state = cellFactory()
-    const openCell = sinon.spy(state, 'openCell');
-    const makeFlagged = sinon.spy(state, 'makeFlagged');
+  test('given a closed cell, when right clicked, then it should fire an action', async function (assert) {
+    const openCellAction = sinon.fake();
+    const flagCellAction = sinon.fake();
 
-    this.set("cell", state);
-    this.set("externalAction", sinon.fake());
+    this.setProperties({
+      cell: cellFactory(),
+      openCellAction,
+      flagCellAction
+    });
 
-    await render(hbs`{{board-cell model=cell onOpenCell=(action externalAction)}}`);
-
-    const rightButton = 2;
-    await click(componentSelector, { button: rightButton });
-
-    assert.ok(makeFlagged.calledOnce)
-    assert.ok(openCell.notCalled)
-  });
-
-  test('given an open cell, when right clicked, then it should do not call makeFlagged', async function (assert) {
-    const state = cellFactory()
-    state.openCell();
-    const makeFlagged = sinon.spy(state, 'makeFlagged');
-
-    this.set("cell", state);
-    this.set("externalAction", sinon.fake());
-
-    await render(hbs`{{board-cell model=cell onOpenCell=(action externalAction)}}`);
+    await render(hbs`{{board-cell model=cell onOpenCell=(action openCellAction) onFlagCell=(action flagCellAction)}}`);
 
     const rightButton = 2;
     await click(componentSelector, { button: rightButton });
 
-    assert.ok(makeFlagged.notCalled)
+    assert.ok(flagCellAction.calledOnce)
+    assert.ok(openCellAction.notCalled)
   });
 
-  test('given a flagged cell, when clicked, then it should do not call openCell', async function (assert) {
+  test('given an open cell, when right clicked, then it should not fire an action', async function (assert) {
+    const cell = cellFactory()
+    cell.openCell();
+    const flagCellAction = sinon.fake();
+
+    this.setProperties({
+      cell,
+      flagCellAction
+    });
+
+    await render(hbs`{{board-cell model=cell onFlagCell=(action flagCellAction)}}`);
+
+    const rightButton = 2;
+    await click(componentSelector, { button: rightButton });
+
+    assert.ok(flagCellAction.notCalled)
+  });
+
+  test('given a closed cell, when firing the open action, the it should pass the model as its argument', async function (assert) {
+    const cell = cellFactory();
+    const flagCellAction = sinon.fake();
+
+    this.setProperties({
+      cell,
+      flagCellAction
+    });
+
+    await render(hbs`{{board-cell model=cell onFlagCell=(action flagCellAction)}}`);
+
+    const rightButton = 2;
+    await click(componentSelector, { button: rightButton });
+
+    assert.ok(flagCellAction.calledWithExactly(cell));
+  });
+
+  test('given a flagged cell, when clicked, then it should not fire an action', async function (assert) {
     const state = cellFactory()
     state.makeFlagged();
-    const openCell = sinon.spy(state, 'openCell');
-
     this.set("cell", state);
-    this.set("externalAction", sinon.fake());
+
+    const externalAction = sinon.fake()
+    this.set("externalAction", externalAction);
 
     await render(hbs`{{board-cell model=cell onOpenCell=(action externalAction)}}`);
 
     await click(componentSelector);
 
-    assert.ok(openCell.notCalled)
+    assert.ok(externalAction.notCalled)
   });
 
   test('given a flagged cell, then it should show an icon', async function (assert) {
