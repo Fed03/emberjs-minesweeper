@@ -7,11 +7,11 @@ const RIGHT_BTN = 2;
 export default Component.extend({
   'data-test-cell-component': true,
   classNameBindings: ['isOpened:board-cell-opened:board-cell-closed'],
-  isOpened: readOnly('cellState.isOpened'),
-  isFlagged: readOnly('cellState.isFlagged'),
+  isOpened: readOnly('model.isOpened'),
+  isFlagged: readOnly('model.isFlagged'),
 
-  hasNeighboringMines: gt('neighboringMines', 0),
-  shouldShowNeighboringMines: and('hasNeighboringMines', not('hasMine')),
+  hasNeighboringMines: gt('model.neighboringMines', 0),
+  shouldShowNeighboringMines: and('hasNeighboringMines', not('model.hasMine')),
 
   click(evt) {
     if (!this.isOpened) {
@@ -25,12 +25,12 @@ export default Component.extend({
 
   handleLeftClick() {
     if (!this.isFlagged) {
-      this.cellState.openCell();
+      this.model.openCell();
       this.onOpenCell();
     }
   },
 
   handleRightClick() {
-    this.cellState.makeFlagged();
+    this.model.makeFlagged();
   }
 });

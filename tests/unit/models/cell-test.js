@@ -39,7 +39,7 @@ module('Unit | Model | Cell', function () {
   });
 
   test('given a cell, it can be tested for its position', function (assert) {
-    const obj = new cellFactory(3, 2);
+    const obj = new cellFactory({ x: 3, y: 2 });
 
     assert.ok(obj.isInPosition(3, 2));
     assert.notOk(obj.isInPosition(3, 0));
