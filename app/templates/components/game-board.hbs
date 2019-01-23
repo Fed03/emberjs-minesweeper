@@ -1,5 +1,3 @@
-{{#each model.cellsMatrix as |cellsRow|}}
-  {{#each cellsRow as |cellModel|}}
-    {{board-cell model=cellModel}}
-  {{/each}}
+{{#each model.cells as |cellModel|}}
+  {{board-cell data-test-cell=cellModel.position model=cellModel onOpenCell=(action "openedCell")}}
 {{/each}}
