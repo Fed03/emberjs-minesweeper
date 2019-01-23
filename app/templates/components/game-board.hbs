@@ -1,1 +1,5 @@
-{{yield}}
+{{#each model.cellsMatrix as |cellsRow|}}
+  {{#each cellsRow as |cellModel|}}
+    {{board-cell model=cellModel}}
+  {{/each}}
+{{/each}}
