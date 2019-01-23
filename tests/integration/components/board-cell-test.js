@@ -9,7 +9,7 @@ import { run } from '@ember/runloop';
 
 const componentSelector = "[data-test-cell-component]";
 
-module('Integration | Component | cell', function (hooks) {
+module('Integration | Component | board-cell', function (hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function (assert) {
