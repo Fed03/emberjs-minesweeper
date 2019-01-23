@@ -2,13 +2,25 @@ import { set } from '@ember/object';
 import { mandatoryParam } from '../utils/mandatory-param';
 
 class Cell {
-  constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), neighboringMines = mandatoryParam()) {
+  constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), neighboringCells = []) {
     this.position = [x, y];
     this.hasMine = hasMine;
-    this.neighboringMines = neighboringMines;
+    this.neighboringCells = neighboringCells;
 
     this.isOpened = false;
     this.isFlagged = false;
+  }
+
+  get neighboringMines() {
+    return this.neighboringCells.filter(cell => cell.hasMine).length;
+  }
+
+  setNeighboringCells(cellsList) {
+    if (this.neighboringCells.length > 0) {
+      throw new Error("Cannot reassign neighboringCells");
+    }
+
+    this.neighboringCells = cellsList;
   }
 
   openCell() {
