@@ -25,7 +25,6 @@ export default Component.extend({
 
   handleLeftClick() {
     if (!this.isFlagged) {
-      this.model.openCell();
       this.onOpenCell(this.model);
     }
   },

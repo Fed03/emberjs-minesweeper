@@ -23,7 +23,26 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   /*
+        0   1   2
+      +---+---+---+
+    0 |   |   |   |
+      +---+---+---+
+    1 |   |   |   |
+      +---+---+---+
+    2 |   |   |   |
+      +---+---+---+
+  */
+  test('given a board structured as in the comment, when clicking on the (2,2) cell, it should be opened', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    this.set("board", boardFactory(3, 3, 0, cells));
+    await render(hbs`{{game-board model=board}}`);
 
+    await click('[data-test-cell="2,2"]');
+
+    assert.ok(getCell(cells, 2, 2).isOpened);
+  });
+
+  /*
         0   1   2
       +---+---+---+
     0 |   | M |   |

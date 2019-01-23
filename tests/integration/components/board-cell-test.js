@@ -79,29 +79,6 @@ module('Integration | Component | board-cell', function (hooks) {
     assert.dom(`${componentSelector} [data-test-mine-icon]`).exists();
   });
 
-  test('given a closed cell, when clicked, then it should show its content', async function (assert) {
-    this.set("cell", cellFactory({ neighboringMines: 3 }))
-    this.set("externalAction", sinon.fake());
-
-    await render(hbs`{{board-cell model=cell onOpenCell=(action externalAction)}}`);
-    await click(componentSelector);
-
-    assert.dom(`${componentSelector} [data-test-neighboring-mines]`).hasText("3");
-  });
-
-  test('given a closed cell, when clicked, then it should openCell', async function (assert) {
-    const state = cellFactory()
-    const openCell = sinon.spy(state, 'openCell');
-    this.set("cell", state);
-
-    this.set("externalAction", sinon.fake());
-    await render(hbs`{{board-cell model=cell onOpenCell=(action externalAction)}}`);
-
-    await click(componentSelector);
-
-    assert.ok(openCell.calledOnce);
-  });
-
   test('given a closed cell, when clicked, then it should fire an action', async function (assert) {
     this.set("cell", cellFactory());
 
@@ -143,7 +120,8 @@ module('Integration | Component | board-cell', function (hooks) {
   });
 
   test('given a closed cell, when opened, then it should change class', async function (assert) {
-    this.set("cell", cellFactory());
+    let cell = cellFactory();
+    this.set("cell", cell);
     this.set("externalAction", sinon.fake());
 
     await render(hbs`{{board-cell model=cell onOpenCell=(action externalAction)}}`);
@@ -151,7 +129,7 @@ module('Integration | Component | board-cell', function (hooks) {
     assert.dom(componentSelector).hasClass("board-cell-closed");
     assert.dom(componentSelector).doesNotHaveClass("board-cell-opened");
 
-    await click(componentSelector);
+    run(() => cell.openCell())
 
     assert.dom(componentSelector).doesNotHaveClass("board-cell-closed");
     assert.dom(componentSelector).hasClass("board-cell-opened");

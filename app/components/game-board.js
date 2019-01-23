@@ -4,15 +4,15 @@ export default Component.extend({
   'data-test-board-component': true,
   actions: {
     openedCell(clickedCell) {
-      this._openNeighboringCell(clickedCell);
+      this._openCell(clickedCell);
     }
   },
 
-  _openNeighboringCell(openedCell) {
+  _openCell(openedCell) {
+    openedCell.openCell();
     if (openedCell.neighboringMines === 0) {
       openedCell.neighboringCells.filter(cell => !cell.isOpened).forEach(cell => {
-        cell.openCell();
-        this._openNeighboringCell(cell);
+        this._openCell(cell);
       });
     }
   }
