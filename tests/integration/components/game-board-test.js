@@ -16,7 +16,7 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   test('given a 3x3 board model then it should render 9 cells', async function (assert) {
-    this.set("board", boardFactory(3, 3));
+    this.set("board", boardFactory({ rows: 3, columns: 3 }));
     await render(hbs`{{game-board model=board}}`);
 
     assert.dom(`${componentSelector} [data-test-cell]`).exists({ count: 9 });
@@ -24,7 +24,7 @@ module('Integration | Component | game-board', function (hooks) {
 
   test('given a board, when right clicking on a close cell, it should be flagged', async function (assert) {
     let cells = cellsListFactory(3, 3);
-    this.set("board", boardFactory(3, 3, 0, cells));
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]', { button: 2 });
@@ -44,7 +44,7 @@ module('Integration | Component | game-board', function (hooks) {
   */
   test('given a board structured as in the comment, when clicking on the (2,2) cell, it should be opened', async function (assert) {
     let cells = cellsListFactory(3, 3);
-    this.set("board", boardFactory(3, 3, 0, cells));
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]');
@@ -67,7 +67,7 @@ module('Integration | Component | game-board', function (hooks) {
     getCell(cells, 0, 1).hasMine = true;
     getCell(cells, 2, 0).hasMine = true;
 
-    this.set("board", boardFactory(3, 3, 2, cells));
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]');
@@ -96,7 +96,7 @@ module('Integration | Component | game-board', function (hooks) {
     let cells = cellsListFactory(3, 3);
     getCell(cells, 1, 2).hasMine = true;
 
-    this.set("board", boardFactory(3, 3, 2, cells));
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]');
@@ -123,7 +123,7 @@ module('Integration | Component | game-board', function (hooks) {
     getCell(cells, 0, 0).hasMine = true;
     getCell(cells, 0, 2).hasMine = true;
 
-    this.set("board", boardFactory(3, 3, 2, cells));
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]');

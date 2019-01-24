@@ -2,7 +2,7 @@ import { Cell } from "minesweeper/models/cell";
 import { Board } from "minesweeper/models/board";
 import range from "lodash.range";
 
-function boardFactory(rows = 0, columns = 0, numberOfMines = 0, cellsList = cellsListFactory(rows, columns)) {
+function boardFactory({ rows = 0, columns = 0, numberOfMines = 0, cellsList = cellsListFactory(rows, columns) } = {}) {
   return new Board(rows, columns, numberOfMines, cellsList);
 }
 
