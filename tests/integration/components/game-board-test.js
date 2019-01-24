@@ -10,7 +10,8 @@ module('Integration | Component | game-board', function (hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function (assert) {
-    await render(hbs`{{game-board}}`);
+    this.set("board", boardFactory());
+    await render(hbs`{{game-board model=board}}`);
 
     assert.dom(componentSelector).exists();
   });
@@ -137,6 +138,20 @@ module('Integration | Component | game-board', function (hooks) {
     assert.ok(getCell(cells, 1, 2).isOpened);
     assert.ok(getCell(cells, 1, 0).isOpened);
     assert.ok(getCell(cells, 2, 0).isOpened);
+  });
+
+  test('given a board, then it should display the number of flagged cells', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+
+    await render(hbs`{{game-board model=board}}`);
+    assert.dom(`${componentSelector} [data-test-flagged-cells-counter]`).hasText("0");
+
+    await click('[data-test-cell="2,2"]', { button: 2 });
+    assert.dom(`${componentSelector} [data-test-flagged-cells-counter]`).hasText("1");
+
+    await click('[data-test-cell="2,2"]', { button: 2 });
+    assert.dom(`${componentSelector} [data-test-flagged-cells-counter]`).hasText("0");
   });
 });
 
