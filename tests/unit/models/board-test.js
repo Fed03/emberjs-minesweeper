@@ -1,19 +1,15 @@
-import { module, /* test */ } from 'qunit';
+import { module, test } from 'qunit';
+import { Board } from "minesweeper/models/board";
 // import { boardFactory, cellFactory } from '../../factories';
 // import isEqual from "lodash.isequal";
 
 module('Unit | Model | Board', function () {
-  // test('given a board with a list of cells, it can compute the number of flagged cells', function (assert) {
-  //   const cells = [
-  //     cellFactory({ isFlagged: true }),
-  //     cellFactory({ isFlagged: true }),
-  //     cellFactory({ isFlagged: true }),
-  //     cellFactory({ isFlagged: false }),
-  //     cellFactory({ isFlagged: false }),
-  //   ];
+  test('given a board it should be possible to increase the elapsed time', function (assert) {
+    const initialElapsedTime = 10;
+    const board = new Board(0, 0, 0, [], initialElapsedTime);
 
-  //   const board = boardFactory({ cellsList: cells });
+    board.increaseElapsedTime();
 
-  //   assert.equal(board.numberOfFlaggedCells, 3);
-  // });
+    assert.equal(board.elapsedTime, 11);
+  });
 })
