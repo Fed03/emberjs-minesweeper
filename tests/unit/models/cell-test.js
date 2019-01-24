@@ -1,9 +1,12 @@
 import { module, test } from 'qunit';
 import { cellFactory } from '../../factories';
+import { Cell } from "minesweeper/models/cell";
 
 module('Unit | Model | Cell', function () {
   test('given a brand new Cell, then it sets some defaults', function (assert) {
-    const obj = cellFactory();
+    const obj = new Cell(0, 0, false);
+
+    assert.propEqual(obj.neighboringCells, []);
     assert.equal(obj.isOpened, false);
     assert.equal(obj.isFlagged, false);
   });
@@ -15,24 +18,29 @@ module('Unit | Model | Cell', function () {
     assert.equal(obj.isOpened, true);
   });
 
-  test('given a brand new Cell, when makeFlagged method is called, then it should set the corresponding prop', function (assert) {
+  test('given an unflagged Cell, when toggleFlag method is called, then the isFlagged prop should be true', function (assert) {
     const obj = cellFactory();
-    obj.makeFlagged();
+    obj.toggleFlag();
 
     assert.equal(obj.isFlagged, true);
   });
 
-  test('given an opened Cell, when makeFlagged method is called, then it should throw', function (assert) {
-    const obj = cellFactory();
-    obj.openCell();
+  test('given a flagged Cell, when toggleFlag method is called, then the isFlagged prop should be false', function (assert) {
+    const obj = cellFactory({ isFlagged: true });
+    obj.toggleFlag();
 
-    let act = () => obj.makeFlagged();
+    assert.equal(obj.isFlagged, false);
+  });
+
+  test('given an opened Cell, when toggleFlag method is called, then it should throw', function (assert) {
+    const obj = cellFactory({ isOpened: true });
+
+    let act = () => obj.toggleFlag();
     assert.throws(act);
   });
 
   test('given a flagged Cell, when openCell method is called, then it should throw', function (assert) {
-    const obj = cellFactory();
-    obj.makeFlagged();
+    const obj = cellFactory({ isFlagged: true });
 
     let act = () => obj.openCell();
     assert.throws(act);

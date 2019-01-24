@@ -1,16 +1,14 @@
 import { set } from '@ember/object';
 import { mandatoryParam } from '../utils/mandatory-param';
 
-
-//TODO: unflag
 class Cell {
-  constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), neighboringCells = []) {
+  constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), isOpened = false, isFlagged = false, neighboringCells = []) {
     this.position = [x, y];
     this.hasMine = hasMine;
     this.neighboringCells = neighboringCells;
 
-    this.isOpened = false;
-    this.isFlagged = false;
+    this.isOpened = isOpened;
+    this.isFlagged = isFlagged;
   }
 
   get neighboringMines() {
@@ -32,11 +30,11 @@ class Cell {
     set(this, 'isOpened', true);
   }
 
-  makeFlagged() {
+  toggleFlag() {
     if (this.isOpened) {
       throw new Error("The cell cannot be flagged because it is already opened");
     }
-    set(this, 'isFlagged', true);
+    set(this, 'isFlagged', !this.isFlagged);
   }
 
   isInPosition(x, y) {

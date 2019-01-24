@@ -7,7 +7,7 @@ export default Component.extend({
       this._openCell(clickedCell);
     },
     flaggedCell(cell) {
-      cell.makeFlagged();
+      cell.toggleFlag();
     }
   },
 

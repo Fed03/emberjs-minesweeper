@@ -6,11 +6,11 @@ function boardFactory(rows = 0, columns = 0, numberOfMines = 0, cellsList = cell
   return new Board(rows, columns, numberOfMines, cellsList);
 }
 
-function cellFactory({ x = 0, y = 0, hasMine = false, neighboringCells = undefined, neighboringMines = 0 } = {}) {
+function cellFactory({ x = 0, y = 0, hasMine = false, isOpened = false, isFlagged = false, neighboringCells = undefined, neighboringMines = 0 } = {}) {
   if (!neighboringCells && neighboringMines > 0) {
     neighboringCells = range(neighboringMines).map(() => cellFactory({ hasMine: true }));
   }
-  return new Cell(x, y, hasMine, neighboringCells)
+  return new Cell(x, y, hasMine, isOpened, isFlagged, neighboringCells)
 }
 
 function cellsListFactory(rows, columns) {

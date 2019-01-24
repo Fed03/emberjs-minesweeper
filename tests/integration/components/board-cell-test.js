@@ -32,30 +32,27 @@ module('Integration | Component | board-cell', function (hooks) {
   });
 
   test('given an opened cell, then it shows the number of neighboring mines', async function (assert) {
-    const state = cellFactory({ neighboringMines: 3 });
-    state.openCell();
-
+    const state = cellFactory({ neighboringMines: 3, isOpened: true });
     this.set("cell", state);
+
     await render(hbs`{{board-cell model=cell}}`);
 
     assert.dom(`${componentSelector} [data-test-neighboring-mines]`).hasText("3");
   });
 
   test('given an opened cell with zero neighboringMines, then it shows nothing', async function (assert) {
-    const state = cellFactory({ neighboringMines: 0 });
-    state.openCell();
-
+    const state = cellFactory({ neighboringMines: 0, isOpened: true });
     this.set("cell", state);
+
     await render(hbs`{{board-cell model=cell}}`);
 
     assert.dom(`${componentSelector} [data-test-neighboring-mines]`).doesNotExist();
   });
 
   test('given an opened cell that has mine, then it should show an icon', async function (assert) {
-    const state = cellFactory({ hasMine: true });
-    state.openCell();
-
+    const state = cellFactory({ hasMine: true, isOpened: true });
     this.set("cell", state);
+
     await render(hbs`{{board-cell model=cell}}`);
 
     assert.dom(`${componentSelector} [data-test-mine-icon]`).exists();
@@ -69,10 +66,9 @@ module('Integration | Component | board-cell', function (hooks) {
   });
 
   test('given an opened cell that has mine and neighboring mines, then it should show only the icon', async function (assert) {
-    const state = cellFactory({ hasMine: true, neighboringMines: 3 });
-    state.openCell();
-
+    const state = cellFactory({ hasMine: true, neighboringMines: 3, isOpened: true });
     this.set("cell", state);
+
     await render(hbs`{{board-cell model=cell}}`);
 
     assert.dom(`${componentSelector} [data-test-neighboring-mines]`).doesNotExist();
@@ -105,8 +101,7 @@ module('Integration | Component | board-cell', function (hooks) {
   });
 
   test('given an already open cell, when clicked, then it should not fire an action', async function (assert) {
-    const state = cellFactory();
-    state.openCell();
+    const state = cellFactory({ isOpened: true });
     this.set("cell", state);
 
     const externalAction = sinon.fake()
@@ -155,8 +150,7 @@ module('Integration | Component | board-cell', function (hooks) {
   });
 
   test('given an open cell, when right clicked, then it should not fire an action', async function (assert) {
-    const cell = cellFactory()
-    cell.openCell();
+    const cell = cellFactory({ isOpened: true });
     const flagCellAction = sinon.fake();
 
     this.setProperties({
@@ -190,8 +184,7 @@ module('Integration | Component | board-cell', function (hooks) {
   });
 
   test('given a flagged cell, when clicked, then it should not fire an action', async function (assert) {
-    const state = cellFactory()
-    state.makeFlagged();
+    const state = cellFactory({ isFlagged: true });
     this.set("cell", state);
 
     const externalAction = sinon.fake()
@@ -212,7 +205,7 @@ module('Integration | Component | board-cell', function (hooks) {
 
     assert.dom(`${componentSelector} [data-test-flag-icon]`).doesNotExist();
 
-    run(() => state.makeFlagged());
+    run(() => state.toggleFlag());
     assert.dom(`${componentSelector} [data-test-flag-icon]`).exists();
   });
 });
