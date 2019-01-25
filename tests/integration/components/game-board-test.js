@@ -3,6 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { boardFactory, cellsListFactory } from "../../factories";
+import { later } from '@ember/runloop';
 
 const componentSelector = "[data-test-board-component]";
 
@@ -152,6 +153,26 @@ module('Integration | Component | game-board', function (hooks) {
 
     await click('[data-test-cell="2,2"]', { button: 2 });
     assert.dom(`${componentSelector} [data-test-flagged-cells-counter]`).hasText("0");
+  });
+
+  test('given a board, then it should display the elapsed time since the game start', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
+
+    await render(hbs`{{game-board model=board}}`);
+    assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("30");
+  });
+
+  test('given a board, when clicking on a cell for the first time, it should start to increase the elapsedTime', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
+
+    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await click('[data-test-cell="2,2"]');
+
+    later(() => {
+      assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
+    }, 120)
   });
 });
 

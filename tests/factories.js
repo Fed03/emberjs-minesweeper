@@ -2,8 +2,8 @@ import { Cell } from "minesweeper/models/cell";
 import { Board } from "minesweeper/models/board";
 import range from "lodash.range";
 
-function boardFactory({ rows = 0, columns = 0, numberOfMines = 0, cellsList = cellsListFactory(rows, columns) } = {}) {
-  return new Board(rows, columns, numberOfMines, cellsList);
+function boardFactory({ rows = 0, columns = 0, numberOfMines = 0, cellsList = cellsListFactory(rows, columns), elapsedTime = 0 } = {}) {
+  return new Board(rows, columns, numberOfMines, cellsList, elapsedTime);
 }
 
 function cellFactory({ x = 0, y = 0, hasMine = false, isOpened = false, isFlagged = false, neighboringCells = undefined, neighboringMines = 0 } = {}) {
