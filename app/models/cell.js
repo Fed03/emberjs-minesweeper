@@ -25,7 +25,7 @@ class Cell {
 
   openCell() {
     if (this.isFlagged) {
-      throw new Error("The cell cannot be opened because it is already been flagged");
+      set(this, 'isFlagged', false);
     }
     set(this, 'isOpened', true);
   }

@@ -39,11 +39,11 @@ module('Unit | Model | Cell', function () {
     assert.throws(act);
   });
 
-  test('given a flagged Cell, when openCell method is called, then it should throw', function (assert) {
+  test('given a flagged Cell, when openCell method is called, then it should unflag', function (assert) {
     const obj = cellFactory({ isFlagged: true });
 
-    let act = () => obj.openCell();
-    assert.throws(act);
+    obj.openCell();
+    assert.equal(obj.isFlagged, false);
   });
 
   test('given a cell, it can be tested for its position', function (assert) {
