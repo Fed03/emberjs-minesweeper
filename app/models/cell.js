@@ -2,7 +2,7 @@ import { set } from '@ember/object';
 import { mandatoryParam } from '../utils/mandatory-param';
 
 class Cell {
-  constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = mandatoryParam(), isOpened = false, isFlagged = false, neighboringCells = []) {
+  constructor(x = mandatoryParam(), y = mandatoryParam(), hasMine = false, isOpened = false, isFlagged = false, neighboringCells = []) {
     this.position = [x, y];
     this.hasMine = hasMine;
     this.neighboringCells = neighboringCells;

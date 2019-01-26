@@ -48,7 +48,8 @@
     "loader.js": "^4.7.0",
     "lodash.isequal": "^4.5.0",
     "lodash.range": "^3.2.0",
-    "qunit-dom": "^0.8.4"
+    "qunit-dom": "^0.8.4",
+    "seedrandom": "^2.4.4"
   },
   "engines": {
     "node": "6.* || 8.* || >= 10.*"
