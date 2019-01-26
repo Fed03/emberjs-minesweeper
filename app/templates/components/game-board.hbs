@@ -1,4 +1,4 @@
-<span data-test-flagged-cells-counter>{{numberOfFlaggedCells}}</span>
+<span data-test-remaining-mines-counter>{{remainingMines}}</span>
 <span data-test-elapsed-time>{{model.elapsedTime}}</span>
 {{#each model.cells as |cellModel|}}
   {{board-cell data-test-cell=cellModel.position model=cellModel onOpenCell=(action "openedCell") onFlagCell=(action "flaggedCell")}}

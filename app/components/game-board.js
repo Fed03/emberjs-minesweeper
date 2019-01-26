@@ -24,6 +24,11 @@ export default Component.extend({
     }
   }),
 
+  remainingMines: computed("numberOfFlaggedCells", "model.numberOfMines", {
+    get() {
+      return this.model.numberOfMines - this.numberOfFlaggedCells;
+    }
+  }),
   actions: {
     openedCell(clickedCell) {
       if (this.gameBlocked) {

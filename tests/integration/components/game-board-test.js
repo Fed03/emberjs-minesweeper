@@ -141,18 +141,23 @@ module('Integration | Component | game-board', function (hooks) {
     assert.ok(getCell(cells, 2, 0).isOpened);
   });
 
-  test('given a board, then it should display the number of flagged cells', async function (assert) {
+  test('given a board, then it should display the number of remaining bombs', async function (assert) {
     let cells = cellsListFactory(3, 3);
-    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, numberOfMines: 2 }));
 
     await render(hbs`{{game-board model=board}}`);
-    assert.dom(`${componentSelector} [data-test-flagged-cells-counter]`).hasText("0");
+    assert.dom(`${componentSelector} [data-test-remaining-mines-counter]`).hasText("2");
 
     await click('[data-test-cell="2,2"]', { button: 2 });
-    assert.dom(`${componentSelector} [data-test-flagged-cells-counter]`).hasText("1");
+    assert.dom(`${componentSelector} [data-test-remaining-mines-counter]`).hasText("1");
 
     await click('[data-test-cell="2,2"]', { button: 2 });
-    assert.dom(`${componentSelector} [data-test-flagged-cells-counter]`).hasText("0");
+    assert.dom(`${componentSelector} [data-test-remaining-mines-counter]`).hasText("2");
+
+    await click('[data-test-cell="2,2"]', { button: 2 });
+    await click('[data-test-cell="2,1"]', { button: 2 });
+    await click('[data-test-cell="2,0"]', { button: 2 });
+    assert.dom(`${componentSelector} [data-test-remaining-mines-counter]`).hasText("-1");
   });
 
   test('given a board, then it should display the elapsed time since the game start', async function (assert) {
