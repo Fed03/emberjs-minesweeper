@@ -43,13 +43,21 @@ export default Component.extend({
   actions: {
     openedCell(clickedCell) {
       this._startGameTimer();
+      if (clickedCell.hasMine) {
+        this._stopGameTimer();
+        this._openAllClosedCells();
+      } else {
+        this._openCell(clickedCell);
       }
-      this._openCell(clickedCell);
     },
     flaggedCell(cell) {
       this._startGameTimer();
       cell.toggleFlag();
     }
+  },
+
+  _openAllClosedCells() {
+    this.model.cells.filter(cell => !cell.isOpened).forEach(cell => cell.openCell());
   },
 
   _openCell(openedCell) {
@@ -68,9 +76,13 @@ export default Component.extend({
     }
   },
 
-  willDestroyElement() {
+  _stopGameTimer() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  },
+
+  willDestroyElement() {
+    this._stopGameTimer();
   }
 });

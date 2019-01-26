@@ -191,6 +191,33 @@ module('Integration | Component | game-board', function (hooks) {
       assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
     }, 120)
   });
+
+  test('given a board, when clicking a mine, it should open all cells', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 1, 2).hasMine = true;
+
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
+
+    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await click('[data-test-cell="1,2"]');
+
+    const openedCells = cells.filter(cell => cell.isOpened);
+    assert.equal(openedCells.length, 9);
+  });
+
+  test('given a board, when clicking a mine, it should stop the elapsed time', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 1, 2).hasMine = true;
+
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
+
+    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await click('[data-test-cell="1,2"]');
+
+    later(() => {
+      assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("30");
+    }, 120)
+  });
 });
 
 function getCell(cells, x, y) {
