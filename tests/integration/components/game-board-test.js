@@ -179,6 +179,18 @@ module('Integration | Component | game-board', function (hooks) {
       assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
     }, 120)
   });
+
+  test('given a board, when flagging a cell for the first time, it should start to increase the elapsedTime', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
+
+    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await click('[data-test-cell="2,2"]', { button: 2 });
+
+    later(() => {
+      assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
+    }, 120)
+  });
 });
 
 function getCell(cells, x, y) {

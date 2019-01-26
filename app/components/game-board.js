@@ -42,13 +42,12 @@ export default Component.extend({
 
   actions: {
     openedCell(clickedCell) {
-      if (this.gameBlocked) {
-        this.gameBlocked = false;
-        this._startGameTimer();
+      this._startGameTimer();
       }
       this._openCell(clickedCell);
     },
     flaggedCell(cell) {
+      this._startGameTimer();
       cell.toggleFlag();
     }
   },
@@ -63,7 +62,10 @@ export default Component.extend({
   },
 
   _startGameTimer() {
-    this.intervalId = setInterval(bind(this.model, this.model.increaseElapsedTime), this.interval);
+    if (this.gameBlocked) {
+      this.gameBlocked = false;
+      this.intervalId = setInterval(bind(this.model, this.model.increaseElapsedTime), this.interval);
+    }
   },
 
   willDestroyElement() {
