@@ -1,5 +1,9 @@
 <span data-test-remaining-mines-counter>{{remainingMines}}</span>
 <span data-test-elapsed-time>{{model.elapsedTime}}</span>
-{{#each model.cells as |cellModel|}}
-  {{board-cell data-test-cell=cellModel.position model=cellModel onOpenCell=(action "openedCell") onFlagCell=(action "flaggedCell")}}
+{{#each cellsByRow as |cellRow|}}
+  <div class="row">
+    {{#each cellRow as |cellModel|}}
+      {{board-cell data-test-cell=cellModel.position model=cellModel onOpenCell=(action "openedCell") onFlagCell=(action "flaggedCell")}}
+    {{/each}}
+  </div>
 {{/each}}

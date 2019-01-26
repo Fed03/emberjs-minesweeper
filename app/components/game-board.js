@@ -29,6 +29,17 @@ export default Component.extend({
       return this.model.numberOfMines - this.numberOfFlaggedCells;
     }
   }),
+
+  cellsByRow: computed("model.cells.[]", {
+    get() {
+      return this.model.cells.reduce((acc, cell) => {
+        let [, y] = cell.position;
+        acc[y] = acc[y] ? [...acc[y], cell] : [cell];
+        return acc;
+      }, []);
+    }
+  }),
+
   actions: {
     openedCell(clickedCell) {
       if (this.gameBlocked) {
