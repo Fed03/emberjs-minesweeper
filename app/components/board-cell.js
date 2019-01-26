@@ -13,7 +13,7 @@ export default Component.extend({
   hasNeighboringMines: gt('model.neighboringMines', 0),
   shouldShowNeighboringMines: and('hasNeighboringMines', not('model.hasMine')),
 
-  click(evt) {
+  mouseDown(evt) {
     if (!this.isOpened) {
       if (evt.button === RIGHT_BTN) {
         this.handleRightClick();
@@ -31,5 +31,9 @@ export default Component.extend({
 
   handleRightClick() {
     this.onFlagCell(this.model);
+  },
+
+  contextMenu(evt) {
+    evt.preventDefault();
   }
 });
