@@ -1,3 +1,5 @@
 <h2 id="title">Welcome to Ember</h2>
 
-{{outlet}}
+<div>
+  {{game-board model=model onResetGame=(action "resetGame")}}
+</div>

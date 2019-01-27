@@ -95,6 +95,7 @@ export default Component.extend({
       allowEscapeKey: false
     }).then(result => {
       if (result.value) {
+        this.gameBlocked = true;
         this.onResetGame();
       }
     });
@@ -111,6 +112,7 @@ export default Component.extend({
       allowEscapeKey: false
     }).then(result => {
       if (result.value) {
+        this.gameBlocked = true;
         this.onResetGame();
       }
     });
