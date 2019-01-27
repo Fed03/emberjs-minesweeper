@@ -1,24 +1,13 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { bind } from '@ember/runloop';
 import { inject } from '@ember/service';
 
 export default Component.extend({
-  'data-test-board-component': true,
+  poll: inject(),
   swal: inject(),
-  timeResolution: "s",
-  gameBlocked: true,
 
-  interval: computed("timeResolution", {
-    get() {
-      switch (this.timeResolution) {
-        case "s":
-          return 1000;
-        case "ms":
-          return 100;
-      }
-    }
-  }),
+  'data-test-board-component': true,
+  gameBlocked: true,
 
   numberOfFlaggedCells: computed("model.cells.@each.isFlagged", {
     get() {
@@ -82,22 +71,28 @@ export default Component.extend({
   _startGameTimer() {
     if (this.gameBlocked) {
       this.gameBlocked = false;
-      this.intervalId = setInterval(bind(this.model, this.model.increaseElapsedTime), this.interval);
+      this.intervalId = this.poll.addPoll({
+        callback: () => this.model.increaseElapsedTime(),
+        interval: 1000
+      });
     }
   },
 
   _stopGameTimer() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
+    if (this.intervalId != undefined) {
+      this.poll.stopPoll(this.intervalId);
     }
   },
 
   _gameWon() {
+    this._stopGameTimer();
     this.swal.open({
       titleText: "WIN!",
       type: "success",
       text: `You won in ${this.model.elapsedTime} seconds`,
-      confirmButtonText: "New Game"
+      confirmButtonText: "New Game",
+      allowOutsideClick: false,
+      allowEscapeKey: false
     }).then(result => {
       if (result.value) {
         this.onResetGame();
@@ -111,7 +106,9 @@ export default Component.extend({
     this.swal.open({
       titleText: "Game Over!",
       type: "error",
-      confirmButtonText: "Retry"
+      confirmButtonText: "Retry",
+      allowOutsideClick: false,
+      allowEscapeKey: false
     }).then(result => {
       if (result.value) {
         this.onResetGame();

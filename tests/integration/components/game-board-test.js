@@ -3,7 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { boardFactory, cellsListFactory } from "../../factories";
-import { later } from '@ember/runloop';
+import { run } from '@ember/runloop';
 import Service from '@ember/service';
 import sinon from 'sinon';
 
@@ -16,12 +16,38 @@ const AlertServiceStub = Service.extend({
   }
 });
 
+const PollServiceStub = Service.extend({
+  init() {
+    this._super(...arguments);
+    this.callBacks = [];
+    this.addPoll = sinon.fake(({ callback }) => {
+      this.callBacks.push(callback);
+      return this.callBacks.length - 1;
+    });
+  },
+
+  elapseTime() {
+    run(() => {
+      this.callBacks.forEach(fn => fn());
+    });
+  },
+
+  stopPoll(idx) {
+    run(() => {
+      this.callBacks.splice(idx, 1);
+    });
+  }
+})
+
 module('Integration | Component | game-board', function (hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
     this.owner.register("service:swal", AlertServiceStub);
     this.alertStub = this.owner.lookup('service:swal');
+
+    this.owner.register("service:poll", PollServiceStub);
+    this.pollStub = this.owner.lookup('service:poll');
   });
 
   test('it renders', async function (assert) {
@@ -183,27 +209,50 @@ module('Integration | Component | game-board', function (hooks) {
 
   test('given a board, when clicking on a cell for the first time, it should start to increase the elapsedTime', async function (assert) {
     this.set("resetAction", sinon.fake());
-    let cells = cellsListFactory(3, 3);
-    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 0, cellsList: cells, elapsedTime: 30 }));
+    let board = boardFactory({ rows: 3, columns: 3, numberOfMines: 1, cellsList: cellsListFactory(3, 3), elapsedTime: 30 })
+    this.set("board", board);
 
-    await render(hbs`{{game-board model=board timeResolution="ms" onResetGame=(action resetAction)}}`);
+    const intervalCallback = sinon.spy(board, "increaseElapsedTime");
+
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
     await click('[data-test-cell="2,2"]');
 
-    later(() => {
-      assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
-    }, 120)
+    this.pollStub.elapseTime();
+
+    assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
+
+    assert.ok(this.pollStub.addPoll.calledOnce);
+    assert.equal(this.pollStub.addPoll.getCall(0).args[0].interval, 1000);
+    assert.ok(intervalCallback.calledOnce);
   });
 
   test('given a board, when flagging a cell for the first time, it should start to increase the elapsedTime', async function (assert) {
     let cells = cellsListFactory(3, 3);
     this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
 
-    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await render(hbs`{{game-board model=board}}`);
     await click('[data-test-cell="2,2"]', { button: 2 });
 
-    later(() => {
-      assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
-    }, 120)
+    this.pollStub.elapseTime();
+
+    assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
+  });
+
+  test('given a board, opening a second cell should not register a new increase of the elapsedTime', async function (assert) {
+    this.set("resetAction", sinon.fake());
+
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 1, 1).hasMine = true;
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 1, cellsList: cells, elapsedTime: 30 }));
+
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
+    await click('[data-test-cell="2,2"]');
+    await click('[data-test-cell="0,0"]');
+
+    this.pollStub.elapseTime();
+
+    assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("31");
+    assert.ok(this.pollStub.addPoll.calledOnce);
   });
 
   test('given a board, when clicking a mine, it should open all cells', async function (assert) {
@@ -213,7 +262,7 @@ module('Integration | Component | game-board', function (hooks) {
 
     this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
 
-    await render(hbs`{{game-board model=board timeResolution="ms" onResetGame=(action resetAction)}}`);
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
     await click('[data-test-cell="1,2"]');
 
     const openedCells = cells.filter(cell => cell.isOpened);
@@ -227,12 +276,12 @@ module('Integration | Component | game-board', function (hooks) {
 
     this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
 
-    await render(hbs`{{game-board model=board timeResolution="ms" onResetGame=(action resetAction)}}`);
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
     await click('[data-test-cell="1,2"]');
 
-    later(() => {
-      assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("30");
-    }, 120)
+    this.pollStub.elapseTime();
+
+    assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("30");
   });
 
   test('given a board, when clicking a mine, it should show an alert', async function (assert) {
@@ -248,7 +297,9 @@ module('Integration | Component | game-board', function (hooks) {
     assert.ok(this.alertStub.open.calledOnceWithExactly({
       titleText: "Game Over!",
       type: "error",
-      confirmButtonText: "Retry"
+      confirmButtonText: "Retry",
+      allowOutsideClick: false,
+      allowEscapeKey: false
     }));
   });
 
@@ -298,7 +349,9 @@ module('Integration | Component | game-board', function (hooks) {
       titleText: "WIN!",
       type: "success",
       text: "You won in 40 seconds",
-      confirmButtonText: "New Game"
+      confirmButtonText: "New Game",
+      allowOutsideClick: false,
+      allowEscapeKey: false
     }));
   });
 
@@ -334,6 +387,38 @@ module('Integration | Component | game-board', function (hooks) {
     await click('[data-test-cell="1,0"]');
 
     assert.ok(resetAction.calledOnce);
+  });
+
+  /*
+      0   1   2
+    +---+---+---+
+  0 | M |   | M |
+    +---+---+---+
+  1 | O | O | O |
+    +---+---+---+
+  2 | O | O | O |
+    +---+---+---+
+*/
+  test('Winning the game should stop the elapsed time', async function (assert) {
+    this.set("resetAction", sinon.fake());
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 0, 0).hasMine = true;
+    getCell(cells, 2, 0).hasMine = true;
+
+    getCell(cells, 0, 1).isOpened = true;
+    getCell(cells, 1, 1).isOpened = true;
+    getCell(cells, 2, 1).isOpened = true;
+    getCell(cells, 0, 2).isOpened = true;
+    getCell(cells, 1, 2).isOpened = true;
+    getCell(cells, 2, 2).isOpened = true;
+
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 2, cellsList: cells, elapsedTime: 20 }));
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
+
+    await click('[data-test-cell="1,0"]');
+    this.pollStub.elapseTime();
+
+    assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("20");
   });
 });
 
