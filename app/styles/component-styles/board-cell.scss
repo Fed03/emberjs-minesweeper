@@ -1,0 +1,14 @@
+&{
+  width: 3vw;
+  height: 3vw;
+  background-color: #cfcfcf;
+  border: 1px solid #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+
+  &.board-cell-opened {
+    background-color: #eee;
+  }
+}
