@@ -12,4 +12,10 @@ module('Unit | Model | Board', function () {
 
     assert.equal(board.elapsedTime, 11);
   });
+
+  test('given a board it should expose the number of safe cells', function (assert) {
+    const board = new Board(3, 4, 10, []);
+
+    assert.equal(board.numberOfSafeCells, 2);
+  });
 })

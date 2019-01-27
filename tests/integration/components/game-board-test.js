@@ -4,11 +4,25 @@ import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { boardFactory, cellsListFactory } from "../../factories";
 import { later } from '@ember/runloop';
+import Service from '@ember/service';
+import sinon from 'sinon';
 
 const componentSelector = "[data-test-board-component]";
 
+const AlertServiceStub = Service.extend({
+  init() {
+    this.open = sinon.fake.resolves({ value: true });
+    this._super(...arguments);
+  }
+});
+
 module('Integration | Component | game-board', function (hooks) {
   setupRenderingTest(hooks);
+
+  hooks.beforeEach(function () {
+    this.owner.register("service:swal", AlertServiceStub);
+    this.alertStub = this.owner.lookup('service:swal');
+  });
 
   test('it renders', async function (assert) {
     this.set("board", boardFactory());
@@ -18,7 +32,7 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   test('given a 3x3 board model then it should render 9 cells', async function (assert) {
-    this.set("board", boardFactory({ rows: 3, columns: 3 }));
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 0 }));
     await render(hbs`{{game-board model=board}}`);
 
     assert.dom(`${componentSelector} [data-test-cell]`).exists({ count: 9 });
@@ -26,7 +40,7 @@ module('Integration | Component | game-board', function (hooks) {
 
   test('given a board, when right clicking on a close cell, it should be flagged', async function (assert) {
     let cells = cellsListFactory(3, 3);
-    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 0, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]', { button: 2 });
@@ -45,9 +59,10 @@ module('Integration | Component | game-board', function (hooks) {
       +---+---+---+
   */
   test('given a board structured as in the comment, when clicking on the (2,2) cell, it should be opened', async function (assert) {
+    this.set("resetAction", sinon.fake());
     let cells = cellsListFactory(3, 3);
-    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
-    await render(hbs`{{game-board model=board}}`);
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 0, cellsList: cells }));
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
 
     await click('[data-test-cell="2,2"]');
 
@@ -66,10 +81,10 @@ module('Integration | Component | game-board', function (hooks) {
   */
   test('given a board structured as in the comment, when clicking on the (2,2) cell, its neghborhood should be opened as well', async function (assert) {
     let cells = cellsListFactory(3, 3);
-    getCell(cells, 0, 1).hasMine = true;
-    getCell(cells, 2, 0).hasMine = true;
+    getCell(cells, 1, 0).hasMine = true;
+    getCell(cells, 0, 2).hasMine = true;
 
-    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 2, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]');
@@ -84,7 +99,6 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   /*
-
         0   1   2
       +---+---+---+
     0 |   |   |   |
@@ -96,9 +110,9 @@ module('Integration | Component | game-board', function (hooks) {
   */
   test('given a board structured as in the comment, when clicking on the (2,2) cell, its neghborhood should not be opened', async function (assert) {
     let cells = cellsListFactory(3, 3);
-    getCell(cells, 1, 2).hasMine = true;
+    getCell(cells, 2, 1).hasMine = true;
 
-    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 1, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]');
@@ -110,7 +124,6 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   /*
-
         0   1   2
       +---+---+---+
     0 | M |   | M |
@@ -123,9 +136,9 @@ module('Integration | Component | game-board', function (hooks) {
   test('given a board structured as in the comment, when clicking on the (2,2) cell, its neghborhood should be opened recursively', async function (assert) {
     let cells = cellsListFactory(3, 3);
     getCell(cells, 0, 0).hasMine = true;
-    getCell(cells, 0, 2).hasMine = true;
+    getCell(cells, 2, 0).hasMine = true;
 
-    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 2, cellsList: cells }));
     await render(hbs`{{game-board model=board}}`);
 
     await click('[data-test-cell="2,2"]');
@@ -137,8 +150,8 @@ module('Integration | Component | game-board', function (hooks) {
     assert.ok(getCell(cells, 1, 1).isOpened);
     assert.ok(getCell(cells, 2, 1).isOpened);
     assert.ok(getCell(cells, 1, 2).isOpened);
-    assert.ok(getCell(cells, 1, 0).isOpened);
-    assert.ok(getCell(cells, 2, 0).isOpened);
+    assert.ok(getCell(cells, 0, 1).isOpened);
+    assert.ok(getCell(cells, 0, 2).isOpened);
   });
 
   test('given a board, then it should display the number of remaining bombs', async function (assert) {
@@ -169,10 +182,11 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   test('given a board, when clicking on a cell for the first time, it should start to increase the elapsedTime', async function (assert) {
+    this.set("resetAction", sinon.fake());
     let cells = cellsListFactory(3, 3);
-    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 0, cellsList: cells, elapsedTime: 30 }));
 
-    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await render(hbs`{{game-board model=board timeResolution="ms" onResetGame=(action resetAction)}}`);
     await click('[data-test-cell="2,2"]');
 
     later(() => {
@@ -193,12 +207,13 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   test('given a board, when clicking a mine, it should open all cells', async function (assert) {
+    this.set("resetAction", sinon.fake());
     let cells = cellsListFactory(3, 3);
     getCell(cells, 1, 2).hasMine = true;
 
     this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
 
-    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await render(hbs`{{game-board model=board timeResolution="ms" onResetGame=(action resetAction)}}`);
     await click('[data-test-cell="1,2"]');
 
     const openedCells = cells.filter(cell => cell.isOpened);
@@ -206,17 +221,119 @@ module('Integration | Component | game-board', function (hooks) {
   });
 
   test('given a board, when clicking a mine, it should stop the elapsed time', async function (assert) {
+    this.set("resetAction", sinon.fake());
     let cells = cellsListFactory(3, 3);
     getCell(cells, 1, 2).hasMine = true;
 
     this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells, elapsedTime: 30 }));
 
-    await render(hbs`{{game-board model=board timeResolution="ms"}}`);
+    await render(hbs`{{game-board model=board timeResolution="ms" onResetGame=(action resetAction)}}`);
     await click('[data-test-cell="1,2"]');
 
     later(() => {
       assert.dom(`${componentSelector} [data-test-elapsed-time]`).hasText("30");
     }, 120)
+  });
+
+  test('given a board, when clicking a mine, it should show an alert', async function (assert) {
+    this.set("resetAction", sinon.fake());
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 1, 2).hasMine = true;
+
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
+    await click('[data-test-cell="1,2"]');
+
+    assert.ok(this.alertStub.open.calledOnceWithExactly({
+      titleText: "Game Over!",
+      type: "error",
+      confirmButtonText: "Retry"
+    }));
+  });
+
+  test('given the game over alert, when its promise resolves, then it should fire a reset game action', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 1, 2).hasMine = true;
+    this.set("board", boardFactory({ rows: 3, columns: 3, cellsList: cells }));
+
+    const resetAction = sinon.fake();
+    this.set("resetAction", resetAction);
+
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
+    await click('[data-test-cell="1,2"]');
+
+    assert.ok(resetAction.calledOnce);
+  });
+
+  /*
+        0   1   2
+      +---+---+---+
+    0 | M |   | M |
+      +---+---+---+
+    1 | O | O | O |
+      +---+---+---+
+    2 | O | O | O |
+      +---+---+---+
+  */
+  test('given a board structured as in the comment, when the last closed cell without a mine is clicked, then it should show an alert', async function (assert) {
+    this.set("resetAction", sinon.fake());
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 0, 0).hasMine = true;
+    getCell(cells, 2, 0).hasMine = true;
+
+    getCell(cells, 0, 1).isOpened = true;
+    getCell(cells, 1, 1).isOpened = true;
+    getCell(cells, 2, 1).isOpened = true;
+    getCell(cells, 0, 2).isOpened = true;
+    getCell(cells, 1, 2).isOpened = true;
+    getCell(cells, 2, 2).isOpened = true;
+
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 2, cellsList: cells, elapsedTime: 40 }));
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
+
+    await click('[data-test-cell="1,0"]');
+
+    assert.ok(this.alertStub.open.calledOnceWithExactly({
+      titleText: "WIN!",
+      type: "success",
+      text: "You won in 40 seconds",
+      confirmButtonText: "New Game"
+    }));
+  });
+
+  /*
+        0   1   2
+      +---+---+---+
+    0 | M |   | M |
+      +---+---+---+
+    1 | O | O | O |
+      +---+---+---+
+    2 | O | O | O |
+      +---+---+---+
+  */
+  test('given the win alert, when its promise resolves, then it should fire a reset game action', async function (assert) {
+    let cells = cellsListFactory(3, 3);
+    getCell(cells, 0, 0).hasMine = true;
+    getCell(cells, 2, 0).hasMine = true;
+
+    getCell(cells, 0, 1).isOpened = true;
+    getCell(cells, 1, 1).isOpened = true;
+    getCell(cells, 2, 1).isOpened = true;
+    getCell(cells, 0, 2).isOpened = true;
+    getCell(cells, 1, 2).isOpened = true;
+    getCell(cells, 2, 2).isOpened = true;
+
+    this.set("board", boardFactory({ rows: 3, columns: 3, numberOfMines: 2, cellsList: cells, }));
+
+    const resetAction = sinon.fake();
+    this.set("resetAction", resetAction);
+
+    await render(hbs`{{game-board model=board onResetGame=(action resetAction)}}`);
+
+    await click('[data-test-cell="1,0"]');
+
+    assert.ok(resetAction.calledOnce);
   });
 });
 

@@ -1,9 +1,11 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { bind } from '@ember/runloop';
+import { inject } from '@ember/service';
 
 export default Component.extend({
   'data-test-board-component': true,
+  swal: inject(),
   timeResolution: "s",
   gameBlocked: true,
 
@@ -30,6 +32,12 @@ export default Component.extend({
     }
   }),
 
+  _numberOfOpenedCells: computed("model.cells.@each.isOpened", {
+    get() {
+      return this.model.cells.filter(cell => cell.isOpened).length
+    }
+  }),
+
   cellsByRow: computed("model.cells.[]", {
     get() {
       return this.model.cells.reduce((acc, cell) => {
@@ -44,10 +52,12 @@ export default Component.extend({
     openedCell(clickedCell) {
       this._startGameTimer();
       if (clickedCell.hasMine) {
-        this._stopGameTimer();
-        this._openAllClosedCells();
+        this._gameOver();
       } else {
         this._openCell(clickedCell);
+        if (this._isWinningConfiguration()) {
+          this._gameWon();
+        }
       }
     },
     flaggedCell(cell) {
@@ -80,6 +90,37 @@ export default Component.extend({
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  },
+
+  _gameWon() {
+    this.swal.open({
+      titleText: "WIN!",
+      type: "success",
+      text: `You won in ${this.model.elapsedTime} seconds`,
+      confirmButtonText: "New Game"
+    }).then(result => {
+      if (result.value) {
+        this.onResetGame();
+      }
+    });
+  },
+
+  _gameOver() {
+    this._stopGameTimer();
+    this._openAllClosedCells();
+    this.swal.open({
+      titleText: "Game Over!",
+      type: "error",
+      confirmButtonText: "Retry"
+    }).then(result => {
+      if (result.value) {
+        this.onResetGame();
+      }
+    });
+  },
+
+  _isWinningConfiguration() {
+    return this.model.numberOfSafeCells == this._numberOfOpenedCells;
   },
 
   willDestroyElement() {

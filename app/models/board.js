@@ -9,6 +9,7 @@ class Board {
     this.cells = cells;
 
     this.elapsedTime = previousElapsedTime;
+    this.numberOfSafeCells = (rows * columns) - numberOfMines;
   }
 
   increaseElapsedTime() {
