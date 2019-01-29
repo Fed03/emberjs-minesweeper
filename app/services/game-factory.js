@@ -13,8 +13,8 @@ export default Service.extend({
 
   _buildCells(rows, columns, numberOfMines) {
     let cells = [];
-    range(rows).forEach(x => {
-      range(columns).forEach(y => {
+    range(rows).forEach(y => {
+      range(columns).forEach(x => {
         cells.push(this._buildSingleCell(x, y));
       });
     });
@@ -36,8 +36,8 @@ export default Service.extend({
   },
 
   * _getNeighborCellsOf([x, y], cellList, rows, cols) {
-    for (const cellX of range(...this._neighborhoodBounds(x, rows))) {
-      for (const cellY of range(...this._neighborhoodBounds(y, cols))) {
+    for (const cellY of range(...this._neighborhoodBounds(y, rows))) {
+      for (const cellX of range(...this._neighborhoodBounds(x, cols))) {
         let cell = cellList.find(cell => cell.isInPosition(cellX, cellY));
         if (!cell.isInPosition(x, y)) {
           yield cell;

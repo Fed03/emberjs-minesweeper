@@ -32,7 +32,7 @@ module('Unit | Service | game-factory', function (hooks) {
     const columns = 2;
     const mines = 3;
 
-    let expectedPositions = [[0, 0], [0, 1], [1, 0], [1, 1]];
+    let expectedPositions = [[0, 0], [1, 0], [0, 1], [1, 1]];
 
     let board = service.setUpNewGame(rows, columns, mines);
 
@@ -48,17 +48,17 @@ module('Unit | Service | game-factory', function (hooks) {
     const mines = 3;
 
     let expectedNeighborsByPosition = new Map();
-    expectedNeighborsByPosition.set([0, 0], [[0, 1], [1, 0], [1, 1]]);
-    expectedNeighborsByPosition.set([0, 1], [[0, 0], [0, 2], [1, 0], [1, 1], [1, 2]]);
+    expectedNeighborsByPosition.set([0, 0], [[1, 0], [0, 1], [1, 1]]);
+    expectedNeighborsByPosition.set([0, 1], [[0, 0], [1, 0], [1, 1], [0, 2], [1, 2]]);
     expectedNeighborsByPosition.set([0, 2], [[0, 1], [1, 1], [1, 2]]);
 
-    expectedNeighborsByPosition.set([1, 0], [[0, 0], [0, 1], [1, 1], [2, 0], [2, 1]]);
-    expectedNeighborsByPosition.set([1, 1], [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1], [2, 2]]);
-    expectedNeighborsByPosition.set([1, 2], [[0, 1], [0, 2], [1, 1], [2, 1], [2, 2]]);
+    expectedNeighborsByPosition.set([1, 0], [[0, 0], [2, 0], [0, 1], [1, 1], [2, 1]]);
+    expectedNeighborsByPosition.set([1, 1], [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1], [0, 2], [1, 2], [2, 2]]);
+    expectedNeighborsByPosition.set([1, 2], [[0, 1], [1, 1], [2, 1], [0, 2], [2, 2]]);
 
     expectedNeighborsByPosition.set([2, 0], [[1, 0], [1, 1], [2, 1]]);
-    expectedNeighborsByPosition.set([2, 1], [[1, 0], [1, 1], [1, 2], [2, 0], [2, 2]]);
-    expectedNeighborsByPosition.set([2, 2], [[1, 1], [1, 2], [2, 1]]);
+    expectedNeighborsByPosition.set([2, 1], [[1, 0], [2, 0], [1, 1], [1, 2], [2, 2]]);
+    expectedNeighborsByPosition.set([2, 2], [[1, 1], [2, 1], [1, 2]]);
 
     let cells = service.setUpNewGame(rows, columns, mines).cells;
 
@@ -66,7 +66,7 @@ module('Unit | Service | game-factory', function (hooks) {
       let expectedNeighborsPositions = getValueByObjKey(expectedNeighborsByPosition, cell.position);
       let actualNeighborsPositions = cell.neighboringCells.map(x => x.position);
 
-      assert.deepEqual(actualNeighborsPositions, expectedNeighborsPositions);
+      assert.deepEqual(actualNeighborsPositions, expectedNeighborsPositions, cell.position);
     });
   });
 
