@@ -1,1 +1,12 @@
+$border-color:#bbb;
+$board-color: #cfcfcf;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Roboto', sans-serif;
+}
+
 @import "pod-styles";

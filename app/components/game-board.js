@@ -21,12 +21,6 @@ export default Component.extend({
     }
   }),
 
-  _numberOfOpenedCells: computed("model.cells.@each.isOpened", {
-    get() {
-      return this.model.cells.filter(cell => cell.isOpened).length
-    }
-  }),
-
   cellsByRow: computed("model.cells.[]", {
     get() {
       return this.model.cells.reduce((acc, cell) => {
@@ -54,6 +48,16 @@ export default Component.extend({
       cell.toggleFlag();
     }
   },
+
+  didRender() {
+    this._makeCellsSquared();
+  },
+
+  _numberOfOpenedCells: computed("model.cells.@each.isOpened", {
+    get() {
+      return this.model.cells.filter(cell => cell.isOpened).length
+    }
+  }),
 
   _openAllClosedCells() {
     this.model.cells.filter(cell => !cell.isOpened).forEach(cell => cell.openCell());
@@ -120,6 +124,18 @@ export default Component.extend({
 
   _isWinningConfiguration() {
     return this.model.numberOfSafeCells == this._numberOfOpenedCells;
+  },
+
+  _makeCellsSquared() {
+    const width = 100 / this.model.columns;
+    let calculatedHeight = 0;
+    Array.from(this.element.getElementsByClassName("board-cell")).forEach(el => {
+      el.style.width = `${width}%`;
+      if (calculatedHeight == 0) {
+        calculatedHeight = el.offsetWidth;
+      }
+      el.style.height = `${calculatedHeight}px`;
+    });
   },
 
   willDestroyElement() {

@@ -1,14 +1,38 @@
 &{
-  width: 3vw;
-  height: 3vw;
-  background-color: #cfcfcf;
-  border: 1px solid #bbb;
+  background-color: $board-color;
+  border: 1px solid $border-color;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  font-size: 1.8rem;
 
   &.board-cell-opened {
-    background-color: #eee;
+    background-color: lighten($board-color, 10);
+  }
+
+  &.one-neigh-mine-cell {
+    color: #0e93fd;
+  }
+  &.two-neigh-mine-cell {
+    color: #589e07;
+  }
+  &.three-neigh-mine-cell {
+    color: #de8502;
+  }
+  &.four-neigh-mine-cell {
+    color: #fd660e;
+  }
+  &.five-neigh-mine-cell {
+    color: #fd0e0e;
+  }
+  &.six-neigh-mine-cell {
+    color: #ae1bbb;
+  }
+  &.seven-neigh-mine-cell {
+    color: #b300ca;
+  }
+  &.eight-neigh-mine-cell {
+    color: #000000;
   }
 }

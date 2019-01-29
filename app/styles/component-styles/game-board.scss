@@ -1,4 +1,28 @@
 & {
+  background-color: lighten($board-color, 5);
+  border: 1px solid $border-color;
+  max-width: 800px;
+
+  > * {
+    padding: 1rem;
+  }
+
+  .board-header {
+    display:flex;
+    justify-content: space-between;
+    border-bottom: 1px solid $border-color;
+
+    .board-counter{
+      font-size: 3rem;
+      padding: .6rem .8rem;
+      width: 8rem;
+      background-color: #333;
+      text-align: right;
+      line-height: 1;
+      color: #ff4f4f;
+    }
+  }
+
   .row {
     display: flex;
   }
