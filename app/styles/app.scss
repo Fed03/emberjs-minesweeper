@@ -8,21 +8,23 @@ html {
   font-family: 'Roboto', sans-serif;
 }
 
-#application {
-  display: flex;
+#application{
   height: 100vh;
 }
 
 #sidebar {
-  width: 20%;
   background-color: darkorange;
 
   form {
-    padding: 25px;
+    padding: 25px 0;
   }
 }
 
 #content {
-  flex-grow: 1;
+  padding: 25px 0;
+
+  .board-wrapper {
+    margin-top: 5vh;
+  }
 }
 
