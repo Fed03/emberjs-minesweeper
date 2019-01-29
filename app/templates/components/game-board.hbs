@@ -4,7 +4,7 @@
 </div>
 <div>
   {{#each cellsByRow as |cellRow|}}
-    <div class="row">
+    <div class="board-row">
       {{#each cellRow as |cellModel|}}
         {{board-cell data-test-cell=cellModel.position model=cellModel onOpenCell=(action "openedCell") onFlagCell=(action "flaggedCell")}}
       {{/each}}
