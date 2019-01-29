@@ -3,7 +3,7 @@ import { inject } from '@ember/service';
 
 export default Route.extend({
   gameFactory: inject(),
-  rows: 10,
+  rows: 5,
   columns: 10,
   numberOfmines: 15,
 

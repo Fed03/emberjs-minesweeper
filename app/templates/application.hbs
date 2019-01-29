@@ -1,5 +1,22 @@
-<h2 id="title">Welcome to Ember</h2>
-
-<div>
-  {{game-board model=model onResetGame=(action "resetGame")}}
+<div id="application">
+  <aside id="sidebar">
+    <form onsubmit={{action "resetGame"}}>
+      <div class="form-group">
+        <label for="rows-input">Number of rows</label>
+        {{input class="form-control" id="rows-input" type="number" value=rows min="1"}}
+      </div>
+      <div class="form-group">
+        <label for="columns-input">Number of columns</label>
+        {{input class="form-control" id="columns-input" type="number" value=columns min="1"}}
+      </div>
+      <div class="form-group">
+        <label for="mines-input">Number of mines</label>
+        {{input class="form-control" id="mines-input" type="number" value=numberOfmines min="1" max=maxMines}}
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Setup new game</button>
+    </form>
+  </aside>
+  <section id="content">
+    {{game-board model=model onResetGame=(action "resetGame")}}
+  </section>
 </div>

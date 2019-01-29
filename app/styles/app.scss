@@ -1,12 +1,28 @@
+@import "ember-cli-bootstrap-4/bootstrap";
+
 $border-color:#bbb;
 $board-color: #cfcfcf;
 
-* {
-  box-sizing: border-box;
-}
-
+@import "pod-styles";
 html {
   font-family: 'Roboto', sans-serif;
 }
 
-@import "pod-styles";
+#application {
+  display: flex;
+  height: 100vh;
+}
+
+#sidebar {
+  width: 20%;
+  background-color: darkorange;
+
+  form {
+    padding: 25px;
+  }
+}
+
+#content {
+  flex-grow: 1;
+}
+
