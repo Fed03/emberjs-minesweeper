@@ -49,6 +49,11 @@ export default Component.extend({
     }
   },
 
+  didUpdateAttrs() {
+    this._stopGameTimer();
+    this.gameBlocked = true;
+  },
+
   didRender() {
     this._makeCellsSquared();
   },
@@ -99,7 +104,6 @@ export default Component.extend({
       allowEscapeKey: false
     }).then(result => {
       if (result.value) {
-        this.gameBlocked = true;
         this.onResetGame();
       }
     });
@@ -116,7 +120,6 @@ export default Component.extend({
       allowEscapeKey: false
     }).then(result => {
       if (result.value) {
-        this.gameBlocked = true;
         this.onResetGame();
       }
     });
@@ -135,6 +138,7 @@ export default Component.extend({
         calculatedHeight = el.offsetWidth;
       }
       el.style.height = `${calculatedHeight}px`;
+      el.style["font-size"] = `${Math.floor(calculatedHeight / 2)}px`;
     });
   },
 
