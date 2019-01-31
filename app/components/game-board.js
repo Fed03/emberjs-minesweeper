@@ -1,6 +1,7 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { inject } from '@ember/service';
+import { schedule } from '@ember/runloop';
 
 export default Component.extend({
   poll: inject(),
@@ -49,13 +50,16 @@ export default Component.extend({
     }
   },
 
+  didInsertElement() {
+    this._makeCellsSquared();
+  },
+
   didUpdateAttrs() {
     this._stopGameTimer();
     this.gameBlocked = true;
-  },
-
-  didRender() {
-    this._makeCellsSquared();
+    schedule("afterRender", () => {
+      this._makeCellsSquared();
+    });
   },
 
   _numberOfOpenedCells: computed("model.cells.@each.isOpened", {
