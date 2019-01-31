@@ -8,23 +8,11 @@ html {
   font-family: 'Roboto', sans-serif;
 }
 
-#application{
-  height: 100vh;
+html,body {
+  @extend .h-100;
 }
 
 #sidebar {
   background-color: darkorange;
-
-  form {
-    padding: 25px 0;
-  }
-}
-
-#content {
-  padding: 25px 0;
-
-  .board-wrapper {
-    margin-top: 5vh;
-  }
 }
 

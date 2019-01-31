@@ -1,6 +1,6 @@
-<div id="application" class="container-fluid">
+<div class="container-fluid h-100">
   <div class="row h-100">
-    <aside id="sidebar" class="col-2">
+    <aside id="sidebar" class="col-2 pt-2">
       <form onsubmit={{action "resetGame"}}>
         <div class="form-group">
           <label for="rows-input">Number of rows</label>
@@ -17,11 +17,11 @@
         <button type="submit" class="btn btn-primary btn-block">Setup new game</button>
       </form>
     </aside>
-    <section id="content" class="col">
+    <section id="content" class="col pt-2">
       <div class="row justify-content-center">
         <div class="col-7">
           <h1>Simple Ember Minesweeper</h1>
-          <div class="board-wrapper">
+          <div class="board-wrapper mt-5">
             {{game-board model=model onResetGame=(action "resetGame")}}
           </div>
         </div>
