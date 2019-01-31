@@ -4325,10 +4325,11 @@ ember-source@~3.7.0:
     jquery "^3.3.1"
     resolve "^1.6.0"
 
-"ember-sweetalert@https://github.com/Tonkpils/ember-sweetalert.git#1.0":
+"ember-sweetalert@https://github.com/Fed03/ember-sweetalert#1.0":
   version "0.1.1"
-  resolved "https://github.com/Tonkpils/ember-sweetalert.git#adc6999004f3ee3e3650a3ec63103069f1149fad"
+  resolved "https://github.com/Fed03/ember-sweetalert#44c0933b30e7330e7b79d7f518ae52b8641fd2f6"
   dependencies:
+    ember-auto-import "^1.2.19"
     ember-cli-babel "^6.6.0"
     sweetalert2 "^7.24.2"
 

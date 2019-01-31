@@ -48,7 +48,7 @@
     "ember-resolver": "^5.0.1",
     "ember-sinon": "^3.1.0",
     "ember-source": "~3.7.0",
-    "ember-sweetalert": "https://github.com/Tonkpils/ember-sweetalert.git#1.0",
+    "ember-sweetalert": "https://github.com/Fed03/ember-sweetalert#1.0",
     "ember-test-selectors": "^2.0.0",
     "eslint-plugin-ember": "^5.2.0",
     "loader.js": "^4.7.0",
